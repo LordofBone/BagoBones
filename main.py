@@ -3,10 +3,6 @@ from inventor import Inventor2040W, MOTOR_A
 from machine import Pin
 
 # Constants
-GEAR_RATIO = 50  # The gear ratio of the motors
-SPEED_SCALE = 5.4  # The scaling to apply to each motor's speed to match its real-world speed
-
-# Constants
 SPEED = 5  # The speed that the LEDs will cycle at
 BRIGHTNESS = 0.4  # The brightness of the LEDs
 UPDATES = 50  # How many times the LEDs will be updated per second
