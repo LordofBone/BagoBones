@@ -1,4 +1,4 @@
-import utime
+import utime, _thread
 from inventor import Inventor2040W, MOTOR_A
 from machine import Pin
 
@@ -122,6 +122,22 @@ board = Inventor2040W()
 m = board.motors[MOTOR_A]
 m.enable()
 
+
+def play_song():
+    # Play the song
+    for i in range(len(SONG)):
+        if SONG[i] == "P":
+            # This is a "pause" note, so stop the motors
+            board.play_silence()
+        else:
+            # Get the frequency of the note and play it
+            board.play_tone(TONES[SONG[i]])
+
+        utime.sleep(NOTE_DURATION)
+
+    board.stop_playing()
+
+
 utime.sleep(3)
 while True:
     print(pir.value())
@@ -132,20 +148,7 @@ while True:
         hue = float(1) / 1.0
         board.leds.set_hsv(1, hue + offset, 1.0, BRIGHTNESS)
 
-        # Play the song
-        for i in range(len(SONG)):
-            if SONG[i] == "P":
-                # This is a "pause" note, so stop the motors
-                board.play_silence()
-            else:
-                # Get the frequency of the note and play it
-                board.play_tone(TONES[SONG[i]])
-
-            utime.sleep(NOTE_DURATION)
-
-        button_toggle = False
-
-        board.stop_playing()
+        _thread.start_new_thread(play_song, ())
 
         # for i in range(50):
         offset += SPEED / 1000.0
