@@ -1,6 +1,6 @@
-from machine import Pin
 import utime
 from inventor import Inventor2040W, MOTOR_A
+from machine import Pin
 
 # Constants
 GEAR_RATIO = 50  # The gear ratio of the motors
