@@ -127,6 +127,11 @@ while True:
     print(pir.value())
     if pir.value() == 1:
         print("Skull saw you")
+
+        # Update all the LEDs
+        hue = float(1) / 1.0
+        board.leds.set_hsv(1, hue + offset, 1.0, BRIGHTNESS)
+
         # Play the song
         for i in range(len(SONG)):
             if SONG[i] == "P":
@@ -145,10 +150,6 @@ while True:
         # for i in range(50):
         offset += SPEED / 1000.0
 
-        # Update all the LEDs
-        hue = float(1) / 1.0
-        board.leds.set_hsv(1, hue + offset, 1.0, BRIGHTNESS)
-
         # Access the motor from Inventor and enable it
         m = board.motors[MOTOR_A]
         m.enable()
@@ -161,16 +162,31 @@ while True:
         # Stop moving
         m.stop()
         utime.sleep(2)
-    else:
+
         # Drive at full negative
         m.full_negative()
         utime.sleep(2)
 
+        # Stop moving
+        m.stop()
+        utime.sleep(2)
+
+        # Drive at full positive
+        m.full_positive()
+        utime.sleep(2)
+
+        # Stop moving
+        m.stop()
+        utime.sleep(2)
+
+        # Drive at full negative
+        m.full_negative()
+        utime.sleep(2)
+    else:
         # Coast to a gradual stop
         m.coast()
         utime.sleep(2)
 
         # Update all the LEDs
         hue = float(1) / 1.0
-        board.leds.set_hsv(1, hue + offset, 0.0, BRIGHTNESS)
-utime.sleep(0.2)
+        board.leds.set_hsv(1, hue + offset, 1.0, 0.0)
