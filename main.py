@@ -1,18 +1,18 @@
-import utime, _thread
+import _thread
+import utime
 from inventor import Inventor2040W, MOTOR_A
 from machine import Pin
 
-# Constants
-SPEED = 5  # The speed that the LEDs will cycle at
-BRIGHTNESS = 0.4  # The brightness of the LEDs
-UPDATES = 50  # How many times the LEDs will be updated per second
+# LED Constants
+SPEED = 5
+BRIGHTNESS = 0.4
+UPDATES = 50
 
-# Variables
+# Motor Variables
 offset = 0.0
 
 pir = Pin(0, Pin.IN, Pin.PULL_DOWN)
 
-# This handy list converts notes into frequencies, which you can use with the inventor.play_tone function
 TONES = {
     "B0": 31,
     "C1": 33,
@@ -105,28 +105,23 @@ TONES = {
     "DS8": 4978
 }
 
-# Put the notes for your song in here!
+# Trying and failing to recreate: https://www.youtube.com/watch?v=ho9rZjlsyYY
 SONG = ("A1", "A2", "D2", "D5", "A5", "A2", "D1", "D2", "A2", "D2", "A2", "G1", "D2")
 
-# The time (in seconds) to play each note for. Change this to make the song play faster or slower
 NOTE_DURATION = 1
 
-# Create a new Inventor2040W
 board = Inventor2040W()
 
-# Access the motor from Inventor and enable it
 m = board.motors[MOTOR_A]
 m.enable()
 
 
 def play_song():
-    # Play the song
+    """Play the song, split into another function to allow for multi-core use"""
     for i in range(len(SONG)):
         if SONG[i] == "P":
-            # This is a "pause" note, so stop the motors
             board.play_silence()
         else:
-            # Get the frequency of the note and play it
             board.play_tone(TONES[SONG[i]])
 
         utime.sleep(NOTE_DURATION)
@@ -136,56 +131,45 @@ def play_song():
 
 utime.sleep(3)
 while True:
-    print(pir.value())
+    """
+    Main loop that waits for PIR detection, then plays the song and turns the motor, also turns on the LED
+    """
     if pir.value() == 1:
-        print("Skull saw you")
 
-        # Update all the LEDs
         hue = float(1) / 1.0
         board.leds.set_hsv(1, hue + offset, 1.0, BRIGHTNESS)
 
         _thread.start_new_thread(play_song, ())
 
-        # for i in range(50):
         offset += SPEED / 1000.0
 
-        # Access the motor from Inventor and enable it
         m = board.motors[MOTOR_A]
         m.enable()
         utime.sleep(2)
 
-        # Drive at full positive
         m.full_positive()
         utime.sleep(2)
 
-        # Stop moving
         m.stop()
         utime.sleep(2)
 
-        # Drive at full negative
         m.full_negative()
         utime.sleep(2)
 
-        # Stop moving
         m.stop()
         utime.sleep(2)
 
-        # Drive at full positive
         m.full_positive()
         utime.sleep(2)
 
-        # Stop moving
         m.stop()
         utime.sleep(2)
 
-        # Drive at full negative
         m.full_negative()
         utime.sleep(2)
     else:
-        # Coast to a gradual stop
         m.coast()
         utime.sleep(2)
 
-        # Update all the LEDs
         hue = float(1) / 1.0
         board.leds.set_hsv(1, hue + offset, 1.0, 0.0)
